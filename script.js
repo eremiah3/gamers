@@ -173,7 +173,7 @@ async function loadGames(category = "all") {
     const res = await fetch(url, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': '8c7f62e776msh3bf9009b158b4dbp15506cjsn84c481f530f',
+        'X-RapidAPI-Key': 'ab18a8dd76mshd42179435dbfe0dp1e3e0bjsn47ec8f29766',
         'X-RapidAPI-Host': 'free-to-play-games-database.p.rapidapi.com'
       }
     });
