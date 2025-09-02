@@ -3,6 +3,7 @@
 // ===================
 const hamburger = document.getElementById('hamburger');
 const menu = document.getElementById('menu');
+
 hamburger.addEventListener('click', () => {
   menu.classList.toggle('show');
   hamburger.classList.toggle('active');
@@ -153,45 +154,65 @@ if (window.ScrollReveal) {
 }
 
 // ===================
-// FreeToGame API (Live with Filters)
+// FreeToGame API (Live with Filters and Load More)
 // ===================
-async function loadGames(category = "all") {
+async function loadGames(category = "all", append = false, limit = 8) {
   const grid = document.getElementById("gamesGrid");
   if (!grid) return;
 
-  grid.innerHTML = `<div class="loading"><span>🎮 Loading games…</span></div>`;
-  const limit = 8;
+  // Show loading state if not appending
+  if (!append) {
+    grid.innerHTML = `<div class="loading"><span>🎮 Loading games…</span></div>`;
+  }
 
   try {
     let url = "https://free-to-play-games-database.p.rapidapi.com/api/games";
 
-    // Only add filter if not "all"
+    // Add filter if not "all" to ensure server-side filtering
     if (category && category !== "all") {
       url += `?category=${category.toLowerCase()}`;
     }
+    console.log("Fetching URL:", url); // Debug the URL
 
     const res = await fetch(url, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': 'ab18a8dd76mshd42179435dbfe0dp1e3e0bjsn47ec8f29766',
+        'X-RapidAPI-Key': 'd2122fc458mshd1e1cdcc51c6e7bp1828aejsn477b8be34180',
         'X-RapidAPI-Host': 'free-to-play-games-database.p.rapidapi.com'
       }
     });
 
-    if (!res.ok) throw new Error("Network error");
+    if (!res.ok) {
+      throw new Error(`Network error! Status: ${res.status} - ${res.statusText}`);
+    }
 
-    const games = await res.json();
+    let games = await res.json(); // Changed to let for reassignment
+    console.log("API Response Length:", games.length, "Data:", games); // Debug response length and data
+
+    // Check if the category filter worked; if not, filter client-side
+    if (category !== "all" && games.length > 0) {
+      const validCategories = ["action", "shooter", "mmorpg", "fighting", "strategy", "racing", "sports", "moba"];
+      if (!validCategories.includes(category.toLowerCase())) {
+        console.warn("Invalid category:", category);
+        grid.innerHTML = `<p style="color:#ff00ff;text-align:center">⚠️ Invalid category selected.</p>`;
+        return;
+      }
+      // Filter client-side if API doesn't respect category
+      games = games.filter(game => game.genre && game.genre.toLowerCase() === category.toLowerCase());
+      console.log("Filtered Games:", games);
+    }
+
     if (!Array.isArray(games) || games.length === 0) {
       grid.innerHTML = `<p style="color:#ff00ff;text-align:center">🚫 No games found in this category.</p>`;
       return;
     }
 
-    // Pick random games if "all", else take first 8
-    const picks = category === "all"
-      ? games.sort(() => 0.5 - Math.random()).slice(0, limit)
-      : games.slice(0, limit);
+    // Pick games based on current limit
+    const picks = games.slice(0, limit);
 
-    grid.innerHTML = "";
+    if (!append) {
+      grid.innerHTML = ""; // Clear grid if not appending
+    }
 
     picks.forEach(game => {
       const card = document.createElement("div");
@@ -204,9 +225,27 @@ async function loadGames(category = "all") {
       `;
       grid.appendChild(card);
     });
+
+    // Add or update Load More button
+    if (games.length > limit) {
+      let loadMoreBtn = document.getElementById("loadMoreBtn");
+      if (!loadMoreBtn) {
+        loadMoreBtn = document.createElement("button");
+        loadMoreBtn.id = "loadMoreBtn";
+        loadMoreBtn.className = "load-more-btn";
+        loadMoreBtn.textContent = "Load More";
+        grid.parentElement.appendChild(loadMoreBtn);
+        loadMoreBtn.addEventListener("click", () => {
+          loadGames(category, true, limit + 8); // Load next 8 games
+        });
+      }
+    } else {
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      if (loadMoreBtn) loadMoreBtn.remove(); // Remove button if no more games
+    }
   } catch (err) {
     console.error("Error loading games:", err);
-    grid.innerHTML = `<p style="color:#ff00ff;text-align:center">⚠️ Failed to load games.<br>Please check your connection and refresh.</p>`;
+    grid.innerHTML = `<p style="color:#ff00ff;text-align:center">⚠️ Failed to load games.<br>Please check your connection and refresh. (Error: ${err.message})</p>`;
   }
 }
 
@@ -219,7 +258,7 @@ filterButtons.forEach(btn => {
     document.querySelector(".filter-btn.active")?.classList.remove("active");
     btn.classList.add("active");
     const category = btn.getAttribute("data-category");
-    loadGames(category);
+    loadGames(category); // Reset to initial load with new category
   });
 });
 

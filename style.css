@@ -2,7 +2,7 @@
   font-family: 'Citrus Gothic Shadow';
   src: url('CitrusGothicShadow.woff2') format('woff2'),
        url('CitrusGothicShadow.woff') format('woff'),
-       url('CitrusGothicShadow.otf') format('opentype'); /* Updated to .otf */
+       url('CitrusGothicShadow-Regular.otf') format('opentype'); /* Updated to .otf */
   font-display: swap;
 }
 
@@ -207,6 +207,7 @@ nav ul li a:hover {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  margin-top: 20px;
 }
 .service-container {
   margin-top: 20px;
@@ -220,6 +221,7 @@ nav ul li a:hover {
   padding: 0 15px;
 }
 .service-card {
+  margin-top: 20px;
   background: rgba(0,0,0,0.8);
   padding: 2rem;
   border-radius: 10px;
@@ -254,6 +256,7 @@ nav ul li a:hover {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
+  margin-top: 20px;
 }
 .gallery-item img {
   width: 100%;
@@ -270,17 +273,19 @@ nav ul li a:hover {
 /* Games Section */
 .games {
   padding: 5rem 2rem;
-  background: url('https://images.unsplash.com/photo-1606112219348-204d7d8b94ee?q=80&w=1470&auto=format&fit=crop') center/cover fixed;
+  background: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1470&auto=format&fit=crop') center/cover fixed;
   text-align: center;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  opacity: 100%;
 }
 .games-grid {
+  margin-top: 30px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 20px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -293,6 +298,7 @@ nav ul li a:hover {
   box-shadow: 0 0 20px #00ffff;
   transition: transform 0.3s ease;
   min-width: 200px;
+  margin-top: 20px;
 }
 .game-card:hover {
   transform: scale(1.05);
@@ -326,6 +332,26 @@ nav ul li a:hover {
   background: #00ffff;
   color: #000;
 }
+.load-more-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #ff00ff;
+  color: #111;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.load-more-btn:hover {
+  background-color: #00ffff;
+}
+
+.loading {
+  color: #ff00ff;
+  font-size: 18px;
+}
 
 /* Game Filters */
 .game-filters {
@@ -335,6 +361,7 @@ nav ul li a:hover {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
+  margin-top: 20px;
 }
 .filter-btn {
   background: #111;
@@ -440,20 +467,33 @@ footer {
 
 @media (max-width: 900px) {
   nav { padding: 15px 20px; }
-  nav ul {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    height: 100vh;
-    width: 250px;
-    background: rgba(0,0,0,0.95);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: right 0.4s;
-    z-index: 1000;
-  }
-  nav ul.show { right: 0; }
+ nav ul {
+  position: absolute;
+  top: 60px; /* just below navbar */
+  right: 15px;
+  width: 200px;
+  background: rgba(0,0,0,0.95);
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none; /* hidden by default */
+}
+
+nav ul.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+nav ul li {
+  margin: 10px 0;
+}
+
   .hamburger { display: flex; }
 
   .hero { height: 90vh; }
